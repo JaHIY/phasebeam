@@ -86,7 +86,7 @@ var phasebeam = function(canvasParentNode) {
                 'amount': 10,
                 'rgba': [255, 255, 255, 0.5]
             },
-            'speed': 0.1,
+            'speed': 0.3,
             'angle': 20
         },
         'setCanvasSize': function() {
@@ -173,7 +173,7 @@ var phasebeam = function(canvasParentNode) {
                     'y': $M.random() * fHeight,
                     'radius': $M.random()*(20+i*5)+(20+i*5),
                     'rgba': crgb.concat($M.random()*0.2+calpha*($M.random()+0.5)),
-                    'speed': speed*(0.2+i*0.5)
+                    'speed': speed*(0.4+i*0.5)
                 });
             }
             while (j > 0) {
@@ -183,7 +183,7 @@ var phasebeam = function(canvasParentNode) {
                     'y': $M.random() * fHeight,
                     'width': $M.random()*(20+j*5)+(20+j*5),
                     'rgba': lrgb.concat($M.random()*0.2+lalpha*($M.random()+0.3)),
-                    'speed': speed*(0.2+j*0.5)
+                    'speed': speed*(0.4+j*0.5)
                 });
             }
             return this;
