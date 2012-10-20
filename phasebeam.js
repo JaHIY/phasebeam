@@ -17,6 +17,7 @@ var phasebeam = function(canvasParentNode) {
                 circles = this.items.circles,
                 lines = this.items.lines,
                 len = circles.length,
+                that = this,
                 item, x, y,radius, speed, width, endX, endY;
             $fctx.clearRect(0, 0, fWidth, fHeight);
             while (len > 0) {
@@ -99,8 +100,8 @@ var phasebeam = function(canvasParentNode) {
         },
         'drawCircle': function(x, y, radius, rgba) {
             var gradient = $fctx.createRadialGradient(x, y, radius, x, y, 0);
-            gradient.addColorStop(0, 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')');
-            gradient.addColorStop(1, 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+(rgba[3]-0.1)+')');
+            gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
+            gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
             $fctx.beginPath();
             $fctx.arc(x, y, radius, 0, $M.PI*2, false);
             $fctx.shadowBlur = radius*0.2;
@@ -110,8 +111,8 @@ var phasebeam = function(canvasParentNode) {
         },
         'drawLine': function(x, y, endX, endY, rgba) {
             var gradient = $fctx.createLinearGradient(x, y, endX, endY);
-            gradient.addColorStop(0, 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')');
-            gradient.addColorStop(1, 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+(rgba[3]-0.1)+')');
+            gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
+            gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
             $fctx.beginPath();
             $fctx.moveTo(x, y);
             $fctx.lineTo(endX, endY);
@@ -189,9 +190,9 @@ var phasebeam = function(canvasParentNode) {
         },
         'items': {}
     }
-}
+};
 
-var window.reqAnimeFrame = (function(callback) {
+window.reqAnimeFrame = (function(callback) {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
