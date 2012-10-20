@@ -17,7 +17,6 @@ var phasebeam = function(canvasParentNode) {
                 circles = this.items.circles,
                 lines = this.items.lines,
                 len = circles.length,
-                that = this,
                 item, x, y,radius, speed, width, endX, endY;
             $fctx.clearRect(0, 0, fWidth, fHeight);
             while (len > 0) {
@@ -27,9 +26,6 @@ var phasebeam = function(canvasParentNode) {
                 y = item.y;
                 radius = item.radius;
                 speed = item.speed;
-                //$fctx.clearRect(x-radius-1, y-radius-1, radius*2+2, radius*2+2);
-                //$fctx.fillStyle="#FFFFFF";
-                //$fctx.fillRect(x-radius-1, y-radius-1, radius*2+2, radius*2+2);
                 if (x > fWidth + radius) {
                     x = -radius;
                 } else if (x < -radius) {
@@ -58,7 +54,6 @@ var phasebeam = function(canvasParentNode) {
                 speed = item.speed;
                 endX = x+$M.sin(degree)*width;
                 endY = y-$M.cos(degree)*width;
-                //$fctx.clearRect(x, y, $M.abs(endX-x), $M.abs(endY-y));
                 if (x > fWidth + width * sin) {
                     x = -width * sin;
                 } else if (x < -width * sin) {
@@ -196,7 +191,7 @@ var phasebeam = function(canvasParentNode) {
     }
 }
 
-window.reqAnimeFrame = (function(callback) {
+var window.reqAnimeFrame = (function(callback) {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
