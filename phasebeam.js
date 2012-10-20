@@ -43,7 +43,7 @@ var phasebeam = function(canvasParentNode) {
                 }
                 item.x = x;
                 item.y = y;
-                this.drawCircle(x, y, radius, item.rgba);
+                this.drawCircle(x, y, radius, item.rgba, item.shadow);
             }
             len = lines.length;
             while (len > 0) {
@@ -71,7 +71,7 @@ var phasebeam = function(canvasParentNode) {
                 }
                 item.x = x;
                 item.y = y;
-                this.drawLine(x, y, endX, endY, item.rgba);
+                this.drawLine(x, y, endX, endY, item.rgba, item.shadow);
             }
             window.reqAnimeFrame(function(){
                 that.animate();
@@ -80,11 +80,13 @@ var phasebeam = function(canvasParentNode) {
         'config': {
             'circle': {
                 'amount': 10,
-                'rgba': [157, 97, 207, 0.3]
+                'rgba': [157, 97, 207, 0.4],
+                'shadow': [46, 30, 105, 0.9]
             },
             'line': {
                 'amount': 10,
-                'rgba': [255, 255, 255, 0.5]
+                'rgba': [255, 255, 255, 0.5],
+                'shadow': [255, 255, 255, 0.8]
             },
             'speed': 0.3,
             'angle': 20
@@ -98,18 +100,18 @@ var phasebeam = function(canvasParentNode) {
             $background.height = wHeight;
             return this;
         },
-        'drawCircle': function(x, y, radius, rgba) {
+        'drawCircle': function(x, y, radius, rgba, shadow) {
             var gradient = $fctx.createRadialGradient(x, y, radius, x, y, 0);
             gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
             gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
             $fctx.beginPath();
             $fctx.arc(x, y, radius, 0, $M.PI*2, false);
             $fctx.shadowBlur = radius*0.2;
-            $fctx.shadowColor = "rgba(46, 30, 105, 0.9)";
+            $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.fillStyle = gradient;
             $fctx.fill();
         },
-        'drawLine': function(x, y, endX, endY, rgba) {
+        'drawLine': function(x, y, endX, endY, rgba, shadow) {
             var gradient = $fctx.createLinearGradient(x, y, endX, endY);
             gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
             gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
@@ -119,7 +121,7 @@ var phasebeam = function(canvasParentNode) {
             $fctx.lineWidth = 3;
             $fctx.lineCap = 'round';
             $fctx.shadowBlur = 5;
-            $fctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+            $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.strokeStyle = gradient;
             $fctx.stroke();
         },
@@ -157,10 +159,14 @@ var phasebeam = function(canvasParentNode) {
                 i = circle.amount,
                 crgb = circle.rgba.slice(0, 3),
                 calpha = circle.rgba[3],
+                cshadow_rgb = circle.shadow.slice(0, 3),
+                cshadow_alpha = circle.shadow[3],
                 line = config.line,
                 j = line.amount,
                 lrgb = line.rgba.slice(0, 3),
                 lalpha = line.rgba[3],
+                lshadow_rgb = line.shadow.slice(0, 3),
+                lshadow_alpha = line.shadow[3],
                 speed = config.speed,
                 fWidth = $foreground.width,
                 fHeight = $foreground.height;
@@ -172,8 +178,9 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random() * fWidth,
                     'y': $M.random() * fHeight,
                     'radius': $M.random()*(20+i*5)+(20+i*5),
-                    'rgba': crgb.concat($M.random()*0.2+calpha*($M.random()+0.5)),
-                    'speed': speed*(0.4+i*0.5)
+                    'rgba': crgb.concat($M.random()*0.3+calpha*$M.random()*0.5),
+                    'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
+                    'speed': speed*(0.8+i*0.5)
                 });
             }
             while (j > 0) {
@@ -182,8 +189,9 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random() * fWidth,
                     'y': $M.random() * fHeight,
                     'width': $M.random()*(20+j*5)+(20+j*5),
-                    'rgba': lrgb.concat($M.random()*0.2+lalpha*($M.random()+0.3)),
-                    'speed': speed*(0.4+j*0.5)
+                    'rgba': lrgb.concat($M.random()*0.2+lalpha*$M.random()*0.6),
+                    'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
+                    'speed': speed*(0.8+j*0.5)
                 });
             }
             return this;
