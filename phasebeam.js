@@ -12,70 +12,110 @@ var phasebeam = function(canvasParentNode) {
             var degree = this.config.angle/360*$M.PI*2,
                 sin = $M.sin(degree),
                 cos = $M.cos(degree),
-                fWidth = $foreground.width,
-                fHeight = $foreground.height,
                 circles = this.items.circles,
                 lines = this.items.lines,
-                len = circles.length,
-                that = this,
-                item, x, y,radius, speed, width, endX, endY;
-            $fctx.clearRect(0, 0, fWidth, fHeight);
-            while (len > 0) {
-                len -= 1;
-                item = circles[len];
-                x = item.x;
-                y = item.y;
-                radius = item.radius;
-                speed = item.speed;
-                if (x > fWidth + radius) {
-                    x = -radius;
-                } else if (x < -radius) {
-                    x = fWidth + radius;
-                } else {
-                    x += sin*speed;
+                drawCircle = this.drawCircle,
+                drawLine = this.drawLine;
+            function drawAnimatedCircles(fWidth, fHeight) {
+                var len = circles.length,
+                    item, x, y, radius, speed;
+                while (len > 0) {
+                    len -= 1;
+                    item = circles[len];
+                    x = item.x;
+                    y = item.y;
+                    radius = item.radius;
+                    speed = item.speed;
+                    if (x > fWidth + radius) {
+                        x = -radius;
+                    } else if (x < -radius) {
+                        x = fWidth + radius;
+                    } else {
+                        x += sin*speed;
+                    }
+                    if (y > fHeight + radius) {
+                        y = -radius;
+                    } else if (y < -radius) {
+                        y = fHeight + radius;
+                    } else {
+                        y -= cos*speed;
+                    }
+                    item.x = x;
+                    item.y = y;
+                    drawCircle(x, y, radius, item.rgba, item.shadow);
                 }
-                if (y > fHeight + radius) {
-                    y = -radius;
-                } else if (y < -radius) {
-                    y = fHeight + radius;
-                } else {
-                    y -= cos*speed;
-                }
-                item.x = x;
-                item.y = y;
-                this.drawCircle(x, y, radius, item.rgba, item.shadow);
             }
-            len = lines.length;
-            while (len > 0) {
-                len -= 1;
-                item = lines[len];
-                x = item.x;
-                y = item.y;
-                width = item.width;
-                speed = item.speed;
-                endX = x+$M.sin(degree)*width;
-                endY = y-$M.cos(degree)*width;
-                if (x > fWidth + width * sin) {
-                    x = -width * sin;
-                } else if (x < -width * sin) {
-                    x = fWidth + width * sin;
-                } else {
-                    x += sin*speed;
+            function drawAnimatedLines(fWidth, fHeight) {
+                var len = lines.length,
+                    item, x, y, width, speed, endX, endY;
+                while (len > 0) {
+                    len -= 1;
+                    item = lines[len];
+                    x = item.x;
+                    y = item.y;
+                    width = item.width;
+                    speed = item.speed;
+                    if (x > fWidth + width * sin) {
+                        x = -width * sin;
+                    } else if (x < -width * sin) {
+                        x = fWidth + width * sin;
+                    } else {
+                        x += sin*speed;
+                    }
+                    if (y > fHeight + width * cos) {
+                        y = -width * cos;
+                    } else if (y < -width * cos) {
+                        y = fHeight + width * cos;
+                    } else {
+                        y -= cos*speed;
+                    }
+                    item.x = x;
+                    item.y = y;
+                    endX = x+sin*width;
+                    endY = y-cos*width;
+                    drawLine(x, y, endX, endY, width, item.rgba, item.shadow);
                 }
-                if (y > fHeight + width * cos) {
-                    y = -width * cos;
-                } else if (y < -width * cos) {
-                    y = fHeight + width * cos;
-                } else {
-                    y -= cos*speed;
-                }
-                item.x = x;
-                item.y = y;
-                this.drawLine(x, y, endX, endY, item.rgba, item.shadow);
             }
-            window.reqAnimeFrame(function(){
-                that.animate();
-            });
+            function clearCircles() {
+                var len = circles.length,
+                    item, x, y, radius;
+                while (len > 0) {
+                    len -= 1;
+                    item = circles[len];
+                    x = item.x;
+                    y = item.y;
+                    radius = item.radius;
+                    $fctx.clearRect(x-radius*1.2-1, y-radius*1.2-1, radius*2.4+2, radius*2.4+2);
+                }
+            }
+            function clearLines() {
+                var len = lines.length,
+                    item, x, y, width, endX, endY, minX, minY;
+                while (len > 0) {
+                    len -= 1;
+                    item = lines[len];
+                    x = item.x;
+                    y = item.y;
+                    width = item.width;
+                    endX = x+sin*width;
+                    endY = y-cos*width;
+                    minX = x < endX ? x : endX;
+                    minY = y < endY ? y : endY;
+                    $fctx.clearRect(minX-cos*width*0.4-1, minY-sin*width*0.4-1, $M.abs(x-endX)+cos*width*0.4*2+2, $M.abs(y-endY)+sin*width*0.4*2+2);
+                }
+            }
+            function start() {
+                var fWidth = $foreground.width,
+                    fHeight = $foreground.height;
+                clearCircles();
+                clearLines();
+                drawAnimatedCircles(fWidth, fHeight);
+                drawAnimatedLines(fWidth, fHeight);
+                window.reqAnimeFrame(function(){
+                    start();
+                });
+            }
+            start();
         },
         'config': {
             'circle': {
@@ -92,12 +132,19 @@ var phasebeam = function(canvasParentNode) {
             'angle': 20
         },
         'setCanvasSize': function() {
-            var wWidth = window.innerWidth,
-                wHeight = window.innerHeight;
+            var w = window,
+                wWidth = w.innerWidth,
+                wHeight = w.innerHeight;
             $foreground.width = wWidth;
             $foreground.height = wHeight;
             $background.width = wWidth;
             $background.height = wHeight;
+            return this;
+        },
+        'clearForegroundCanvas': function() {
+            var fWidth = $foreground.width,
+                fHeight = $foreground.height;
+            $fctx.clearRect(0, 0, fWidth, fHeight);
             return this;
         },
         'drawCircle': function(x, y, radius, rgba, shadow) {
@@ -111,7 +158,7 @@ var phasebeam = function(canvasParentNode) {
             $fctx.fillStyle = gradient;
             $fctx.fill();
         },
-        'drawLine': function(x, y, endX, endY, rgba, shadow) {
+        'drawLine': function(x, y, endX, endY, width, rgba, shadow) {
             var gradient = $fctx.createLinearGradient(x, y, endX, endY);
             gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
             gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
@@ -120,7 +167,7 @@ var phasebeam = function(canvasParentNode) {
             $fctx.lineTo(endX, endY);
             $fctx.lineWidth = 3;
             $fctx.lineCap = 'round';
-            $fctx.shadowBlur = 5;
+            $fctx.shadowBlur = width*0.2;
             $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.strokeStyle = gradient;
             $fctx.stroke();
@@ -214,10 +261,10 @@ window.reqAnimeFrame = (function(callback) {
 
 var amazing = phasebeam(document.getElementById('phasebeam'));
 window.addEventListener("load", function () {
-    amazing.setCanvasSize().drawBackground().createItems().animate();
+    amazing.setCanvasSize().createItems().drawBackground().animate();
 }, false);
 window.addEventListener("resize", function () {
-    amazing.setCanvasSize().drawBackground();
+    amazing.setCanvasSize().drawBackground().clearForegroundCanvas();
     setTimeout(function() {
         amazing.createItems();
     }, 500)
