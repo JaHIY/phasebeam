@@ -12,6 +12,8 @@ var phasebeam = function(canvasParentNode) {
             var degree = this.config.angle/360*$M.PI*2,
                 sin = $M.sin(degree),
                 cos = $M.cos(degree),
+                sinAbs = $M.abs(sin),
+                cosAbs = $M.abs(cos),
                 circles = this.items.circles,
                 lines = this.items.lines,
                 drawCircle = this.drawCircle,
@@ -101,7 +103,7 @@ var phasebeam = function(canvasParentNode) {
                     endY = y-cos*width;
                     minX = x < endX ? x : endX;
                     minY = y < endY ? y : endY;
-                    $fctx.clearRect(minX-cos*width*0.4-1, minY-sin*width*0.4-1, $M.abs(x-endX)+cos*width*0.4*2+2, $M.abs(y-endY)+sin*width*0.4*2+2);
+                    $fctx.clearRect(minX-cosAbs*width*0.4, minY-sinAbs*width*0.4, $M.abs(x-endX)+cosAbs*width*0.4*2, $M.abs(y-endY)+sinAbs*width*0.4*2);
                 }
             }
             function start() {
@@ -167,7 +169,7 @@ var phasebeam = function(canvasParentNode) {
             $fctx.lineTo(endX, endY);
             $fctx.lineWidth = 3;
             $fctx.lineCap = 'round';
-            $fctx.shadowBlur = width*0.2;
+            $fctx.shadowBlur = width*0.1;
             $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.strokeStyle = gradient;
             $fctx.stroke();
