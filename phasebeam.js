@@ -140,7 +140,7 @@ var phasebeam = function(canvasParentNode) {
                 'shadow': [255, 255, 255, 0.8],
                 'blur': 0.1
             },
-            'speed': 0.3,
+            'speed': 2.5,
             'angle': 20
         },
         'setCanvasSize': function() {
@@ -213,7 +213,12 @@ var phasebeam = function(canvasParentNode) {
             return this;
         },
         'createItems': function() {
-            var config = this.config,
+            var degree = this.config.angle/360*$M.PI*2,
+                sin = $M.sin(degree),
+                cos = $M.cos(degree),
+                sinAbs = $M.abs(sin),
+                cosAbs = $M.abs(cos),
+                config = this.config,
                 circle = config.circle,
                 i = circle.amount,
                 crgb = circle.rgba.slice(0, 3),
@@ -228,15 +233,17 @@ var phasebeam = function(canvasParentNode) {
                 lshadow_alpha = line.shadow[3],
                 speed = config.speed,
                 fWidth = $foreground.width,
-                fHeight = $foreground.height;
+                fHeight = $foreground.height,
+                radius, width;
             this.items.circles = [];
             this.items.lines = [];
             while (i > 0) {
                 i -= 1;
+                radius = $M.random()*(20+i*5)+(20+i*5);
                 this.items.circles.push({
-                    'x': $M.random() * fWidth,
-                    'y': $M.random() * fHeight,
-                    'radius': $M.random()*(20+i*5)+(20+i*5),
+                    'x': $M.random()*(fWidth+radius*2),
+                    'y': $M.random()*(fHeight+radius*2),
+                    'radius': radius,
                     'rgba': crgb.concat($M.random()*0.3+calpha*$M.random()*0.5),
                     'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
                     'blur': $M.random()*blur*0.5,
@@ -245,10 +252,11 @@ var phasebeam = function(canvasParentNode) {
             }
             while (j > 0) {
                 j -= 1;
+                width = $M.random()*(20+j*5)+(20+j*5);
                 this.items.lines.push({
-                    'x': $M.random() * fWidth,
-                    'y': $M.random() * fHeight,
-                    'width': $M.random()*(20+j*5)+(20+j*5),
+                    'x': $M.random()*(fWidth+width*cosAbs),
+                    'y': $M.random()*(fHeight+width*sinAbs),
+                    'width': width,
                     'rgba': lrgb.concat($M.random()*0.2+lalpha*$M.random()*0.6),
                     'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
                     'blur': $M.random()*blur*0.5,
