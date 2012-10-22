@@ -18,16 +18,21 @@ var phasebeam = function(canvasParentNode) {
                 lines = this.items.lines,
                 drawCircle = this.drawCircle,
                 drawLine = this.drawLine,
+                circlesLastTime = [],
+                linesLastTime = [],
                 drawAnimatedCircles = function(fWidth, fHeight) {
                 var len = circles.length,
-                    item, x, y, radius, speed;
+                    item, x, y, radius, speed, time, lastTime;
                 while (len > 0) {
                     len -= 1;
                     item = circles[len];
+                    time = +new Date();
+                    lastTime = circlesLastTime[len] || time;
+                    circlesLastTime[len] = time;
                     x = item.x;
                     y = item.y;
                     radius = item.radius;
-                    speed = item.speed;
+                    speed = item.speed*(time-lastTime)/100;
                     if (x > fWidth + radius) {
                         x = -radius;
                     } else if (x < -radius) {
@@ -44,19 +49,22 @@ var phasebeam = function(canvasParentNode) {
                     }
                     item.x = x;
                     item.y = y;
-                    drawCircle(x, y, radius, item.rgba, item.shadow);
+                    drawCircle(x, y, radius, item.rgba, item.shadow, item.blur);
                 }
             },
             drawAnimatedLines = function(fWidth, fHeight) {
                 var len = lines.length,
-                    item, x, y, width, speed, endX, endY;
+                    item, x, y, width, speed, endX, endY, time, lastTime;
                 while (len > 0) {
                     len -= 1;
                     item = lines[len];
+                    time = +new Date();
+                    lastTime = linesLastTime[len] || time;
+                    linesLastTime[len] = time;
                     x = item.x;
                     y = item.y;
                     width = item.width;
-                    speed = item.speed;
+                    speed = item.speed*(time-lastTime)/100;
                     if (x > fWidth + width * sin) {
                         x = -width * sin;
                     } else if (x < -width * sin) {
@@ -75,7 +83,7 @@ var phasebeam = function(canvasParentNode) {
                     item.y = y;
                     endX = x+sin*width;
                     endY = y-cos*width;
-                    drawLine(x, y, endX, endY, width, item.rgba, item.shadow);
+                    drawLine(x, y, endX, endY, width, item.rgba, item.shadow, item.blur);
                 }
             },
             clearCircles = function() {
@@ -123,12 +131,14 @@ var phasebeam = function(canvasParentNode) {
             'circle': {
                 'amount': 10,
                 'rgba': [157, 97, 207, 0.4],
-                'shadow': [46, 30, 105, 0.9]
+                'shadow': [46, 30, 105, 0.9],
+                'blur': 0.2
             },
             'line': {
                 'amount': 10,
                 'rgba': [255, 255, 255, 0.5],
-                'shadow': [255, 255, 255, 0.8]
+                'shadow': [255, 255, 255, 0.8],
+                'blur': 0.1
             },
             'speed': 0.3,
             'angle': 20
@@ -149,18 +159,18 @@ var phasebeam = function(canvasParentNode) {
             $fctx.clearRect(0, 0, fWidth, fHeight);
             return this;
         },
-        'drawCircle': function(x, y, radius, rgba, shadow) {
+        'drawCircle': function(x, y, radius, rgba, shadow, blur) {
             var gradient = $fctx.createRadialGradient(x, y, radius, x, y, 0);
             gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
             gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
             $fctx.beginPath();
             $fctx.arc(x, y, radius, 0, $M.PI*2, false);
-            $fctx.shadowBlur = radius*0.2;
+            $fctx.shadowBlur = radius*blur;
             $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.fillStyle = gradient;
             $fctx.fill();
         },
-        'drawLine': function(x, y, endX, endY, width, rgba, shadow) {
+        'drawLine': function(x, y, endX, endY, width, rgba, shadow, blur) {
             var gradient = $fctx.createLinearGradient(x, y, endX, endY);
             gradient.addColorStop(0, 'rgba('+rgba.join(',')+')');
             gradient.addColorStop(1, 'rgba('+rgba.slice(0, 3).join(',')+','+(rgba[3]-0.1)+')');
@@ -169,7 +179,7 @@ var phasebeam = function(canvasParentNode) {
             $fctx.lineTo(endX, endY);
             $fctx.lineWidth = 3;
             $fctx.lineCap = 'round';
-            $fctx.shadowBlur = width*0.1;
+            $fctx.shadowBlur = width*blur;
             $fctx.shadowColor = 'rgba('+shadow.join(',')+')';
             $fctx.strokeStyle = gradient;
             $fctx.stroke();
@@ -229,6 +239,7 @@ var phasebeam = function(canvasParentNode) {
                     'radius': $M.random()*(20+i*5)+(20+i*5),
                     'rgba': crgb.concat($M.random()*0.3+calpha*$M.random()*0.5),
                     'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
+                    'blur': $M.random()*blur*0.5,
                     'speed': speed*(0.8+i*0.5)
                 });
             }
@@ -240,6 +251,7 @@ var phasebeam = function(canvasParentNode) {
                     'width': $M.random()*(20+j*5)+(20+j*5),
                     'rgba': lrgb.concat($M.random()*0.2+lalpha*$M.random()*0.6),
                     'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
+                    'blur': $M.random()*blur*0.5,
                     'speed': speed*(0.8+j*0.5)
                 });
             }
