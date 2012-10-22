@@ -17,8 +17,8 @@ var phasebeam = function(canvasParentNode) {
                 circles = this.items.circles,
                 lines = this.items.lines,
                 drawCircle = this.drawCircle,
-                drawLine = this.drawLine;
-            function drawAnimatedCircles(fWidth, fHeight) {
+                drawLine = this.drawLine,
+                drawAnimatedCircles = function(fWidth, fHeight) {
                 var len = circles.length,
                     item, x, y, radius, speed;
                 while (len > 0) {
@@ -46,8 +46,8 @@ var phasebeam = function(canvasParentNode) {
                     item.y = y;
                     drawCircle(x, y, radius, item.rgba, item.shadow);
                 }
-            }
-            function drawAnimatedLines(fWidth, fHeight) {
+            },
+            drawAnimatedLines = function(fWidth, fHeight) {
                 var len = lines.length,
                     item, x, y, width, speed, endX, endY;
                 while (len > 0) {
@@ -77,8 +77,8 @@ var phasebeam = function(canvasParentNode) {
                     endY = y-cos*width;
                     drawLine(x, y, endX, endY, width, item.rgba, item.shadow);
                 }
-            }
-            function clearCircles() {
+            },
+            clearCircles = function() {
                 var len = circles.length,
                     item, x, y, radius;
                 while (len > 0) {
@@ -89,8 +89,8 @@ var phasebeam = function(canvasParentNode) {
                     radius = item.radius;
                     $fctx.clearRect(x-radius*1.2-1, y-radius*1.2-1, radius*2.4+2, radius*2.4+2);
                 }
-            }
-            function clearLines() {
+            },
+            clearLines = function() {
                 var len = lines.length,
                     item, x, y, width, endX, endY, minX, minY;
                 while (len > 0) {
@@ -105,8 +105,8 @@ var phasebeam = function(canvasParentNode) {
                     minY = y < endY ? y : endY;
                     $fctx.clearRect(minX-cosAbs*width*0.4, minY-sinAbs*width*0.4, $M.abs(x-endX)+cosAbs*width*0.4*2, $M.abs(y-endY)+sinAbs*width*0.4*2);
                 }
-            }
-            function start() {
+            },
+            start = function() {
                 var fWidth = $foreground.width,
                     fHeight = $foreground.height;
                 clearCircles();
@@ -116,7 +116,7 @@ var phasebeam = function(canvasParentNode) {
                 window.reqAnimeFrame(function(){
                     start();
                 });
-            }
+            };
             start();
         },
         'config': {
@@ -249,8 +249,7 @@ var phasebeam = function(canvasParentNode) {
     }
 };
 
-window.reqAnimeFrame = (function(callback) {
-    return window.requestAnimationFrame ||
+window.reqAnimeFrame = window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
@@ -258,7 +257,6 @@ window.reqAnimeFrame = (function(callback) {
         function(callback){
             window.setTimeout(callback, 1000 / 60);
         };
-})();
 
 
 var amazing = phasebeam(document.getElementById('phasebeam'));
