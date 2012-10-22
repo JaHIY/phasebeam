@@ -140,7 +140,7 @@ var phasebeam = function(canvasParentNode) {
                 'shadow': [255, 255, 255, 0.8],
                 'blur': 0.1
             },
-            'speed': 2.5,
+            'speed': 0.5,
             'angle': 20
         },
         'setCanvasSize': function() {
