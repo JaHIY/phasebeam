@@ -10,10 +10,10 @@ var phasebeam = function(canvasParentNode) {
     return {
         'animate': function() {
             var degree = this.config.angle/360*$M.PI*2,
-                sin = $M.sin(degree),
-                cos = $M.cos(degree),
-                sinAbs = $M.abs(sin),
-                cosAbs = $M.abs(cos),
+                sina = $M.sin(degree),
+                cosa = $M.cos(degree),
+                sinaAbs = $M.abs(sina),
+                cosaAbs = $M.abs(cosa),
                 circles = this.items.circles,
                 lines = this.items.lines,
                 drawCircle = this.drawCircle,
@@ -38,14 +38,14 @@ var phasebeam = function(canvasParentNode) {
                     } else if (x < -radius) {
                         x = fWidth + radius;
                     } else {
-                        x += sin*speed;
+                        x += sina*speed;
                     }
                     if (y > fHeight + radius) {
                         y = -radius;
                     } else if (y < -radius) {
                         y = fHeight + radius;
                     } else {
-                        y -= cos*speed;
+                        y -= cosa*speed;
                     }
                     item.x = x;
                     item.y = y;
@@ -65,24 +65,24 @@ var phasebeam = function(canvasParentNode) {
                     y = item.y;
                     width = item.width;
                     speed = item.speed*(time-lastTime)/100;
-                    if (x > fWidth + width * sin) {
-                        x = -width * sin;
-                    } else if (x < -width * sin) {
-                        x = fWidth + width * sin;
+                    if (x > fWidth + width * sina) {
+                        x = -width * sina;
+                    } else if (x < -width * sina) {
+                        x = fWidth + width * sina;
                     } else {
-                        x += sin*speed;
+                        x += sina*speed;
                     }
-                    if (y > fHeight + width * cos) {
-                        y = -width * cos;
-                    } else if (y < -width * cos) {
-                        y = fHeight + width * cos;
+                    if (y > fHeight + width * cosa) {
+                        y = -width * cosa;
+                    } else if (y < -width * cosa) {
+                        y = fHeight + width * cosa;
                     } else {
-                        y -= cos*speed;
+                        y -= cosa*speed;
                     }
                     item.x = x;
                     item.y = y;
-                    endX = x+sin*width;
-                    endY = y-cos*width;
+                    endX = x+sina*width;
+                    endY = y-cosa*width;
                     drawLine(x, y, endX, endY, width, item.rgba, item.shadow, item.blur);
                 }
             },
@@ -107,11 +107,11 @@ var phasebeam = function(canvasParentNode) {
                     x = item.x;
                     y = item.y;
                     width = item.width;
-                    endX = x+sin*width;
-                    endY = y-cos*width;
+                    endX = x+sina*width;
+                    endY = y-cosa*width;
                     minX = x < endX ? x : endX;
                     minY = y < endY ? y : endY;
-                    $fctx.clearRect(minX-cosAbs*width*0.4, minY-sinAbs*width*0.4, $M.abs(x-endX)+cosAbs*width*0.4*2, $M.abs(y-endY)+sinAbs*width*0.4*2);
+                    $fctx.clearRect(minX-cosaAbs*width*0.4, minY-sinaAbs*width*0.4, $M.abs(x-endX)+cosaAbs*width*0.4*2, $M.abs(y-endY)+sinaAbs*width*0.4*2);
                 }
             },
             start = function() {
@@ -132,15 +132,16 @@ var phasebeam = function(canvasParentNode) {
                 'amount': 10,
                 'rgba': [157, 97, 207, 0.4],
                 'shadow': [46, 30, 105, 0.9],
-                'blur': 0.2
+                'blur': 0.2,
+                'speed': 0.3,
             },
             'line': {
                 'amount': 10,
                 'rgba': [255, 255, 255, 0.5],
                 'shadow': [255, 255, 255, 0.8],
-                'blur': 0.1
+                'blur': 0.1,
+                'speed': 0.5,
             },
-            'speed': 0.5,
             'angle': 20
         },
         'setCanvasSize': function() {
@@ -214,24 +215,27 @@ var phasebeam = function(canvasParentNode) {
         },
         'createItems': function() {
             var degree = this.config.angle/360*$M.PI*2,
-                sin = $M.sin(degree),
-                cos = $M.cos(degree),
-                sinAbs = $M.abs(sin),
-                cosAbs = $M.abs(cos),
+                sina = $M.sin(degree),
+                cosa = $M.cos(degree),
+                sinaAbs = $M.abs(sina),
+                cosaAbs = $M.abs(cosa),
                 config = this.config,
                 circle = config.circle,
                 i = circle.amount,
-                crgb = circle.rgba.slice(0, 3),
-                calpha = circle.rgba[3],
-                cshadow_rgb = circle.shadow.slice(0, 3),
-                cshadow_alpha = circle.shadow[3],
+                circle_rgb = circle.rgba.slice(0, 3),
+                circle_alpha = circle.rgba[3],
+                circle_shadow_rgb = circle.shadow.slice(0, 3),
+                circle_shadow_alpha = circle.shadow[3],
+                circle_blur = circle.blur,
+                circle_speed = circle.speed,
                 line = config.line,
                 j = line.amount,
-                lrgb = line.rgba.slice(0, 3),
-                lalpha = line.rgba[3],
-                lshadow_rgb = line.shadow.slice(0, 3),
-                lshadow_alpha = line.shadow[3],
-                speed = config.speed,
+                line_rgb = line.rgba.slice(0, 3),
+                line_alpha = line.rgba[3],
+                line_shadow_rgb = line.shadow.slice(0, 3),
+                line_shadow_alpha = line.shadow[3],
+                line_blur = line.blur,
+                line_speed = line.speed,
                 fWidth = $foreground.width,
                 fHeight = $foreground.height,
                 radius, width;
@@ -241,26 +245,26 @@ var phasebeam = function(canvasParentNode) {
                 i -= 1;
                 radius = $M.random()*(20+i*5)+(20+i*5);
                 this.items.circles.push({
-                    'x': $M.random()*(fWidth+radius*2),
-                    'y': $M.random()*(fHeight+radius*2),
+                    'x': $M.random()*(fWidth+radius*4),
+                    'y': $M.random()*(fHeight+radius*4),
                     'radius': radius,
-                    'rgba': crgb.concat($M.random()*0.3+calpha*$M.random()*0.5),
-                    'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
-                    'blur': $M.random()*blur*0.5,
-                    'speed': speed*(0.8+i*0.5)
+                    'rgba': circle_rgb.concat($M.random()*0.3+circle_alpha*$M.random()*0.5),
+                    'shadow': circle_shadow_rgb.concat($M.random()*0.5+circle_shadow_alpha*0.5),
+                    'blur': $M.random()*circle_blur*0.5,
+                    'speed': circle_speed*(0.8+i*0.5)
                 });
             }
             while (j > 0) {
                 j -= 1;
                 width = $M.random()*(20+j*5)+(20+j*5);
                 this.items.lines.push({
-                    'x': $M.random()*(fWidth+width*cosAbs),
-                    'y': $M.random()*(fHeight+width*sinAbs),
+                    'x': $M.random()*(fWidth+width*cosaAbs),
+                    'y': $M.random()*(fHeight+width*sinaAbs),
                     'width': width,
-                    'rgba': lrgb.concat($M.random()*0.2+lalpha*$M.random()*0.6),
-                    'shadow': cshadow_rgb.concat($M.random()*0.5+cshadow_alpha*0.5),
-                    'blur': $M.random()*blur*0.5,
-                    'speed': speed*(0.8+j*0.5)
+                    'rgba': line_rgb.concat($M.random()*0.2+line_alpha*$M.random()*0.6),
+                    'shadow': line_shadow_rgb.concat($M.random()*0.5+line_shadow_alpha*0.5),
+                    'blur': $M.random()*line_blur*0.5,
+                    'speed': line_speed*(0.8+j*0.5)
                 });
             }
             return this;
