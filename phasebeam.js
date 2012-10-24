@@ -6,7 +6,8 @@ var phasebeam = function(canvasParentNode) {
         $background = $canvas[0],
         $fctx = $foreground.getContext('2d'),
         $bctx = $background.getContext('2d'),
-        $M = window.Math;
+        $w = window,
+        $M = $w.Math;
     return {
         'animate': function() {
             var degree = this.config.angle/360*$M.PI*2,
@@ -20,6 +21,7 @@ var phasebeam = function(canvasParentNode) {
                 drawLine = this.drawLine,
                 circlesLastTime = [],
                 linesLastTime = [],
+                w = $w,
                 drawAnimatedCircles = function(fWidth, fHeight) {
                 var len = circles.length,
                     item, x, y, radius, speed, time, lastTime;
@@ -121,7 +123,7 @@ var phasebeam = function(canvasParentNode) {
                 clearLines();
                 drawAnimatedCircles(fWidth, fHeight);
                 drawAnimatedLines(fWidth, fHeight);
-                window.reqAnimeFrame(function(){
+                w.reqAnimeFrame(function(){
                     start();
                 });
             };
@@ -145,7 +147,7 @@ var phasebeam = function(canvasParentNode) {
             'angle': 20
         },
         'setCanvasSize': function() {
-            var w = window,
+            var w = $w,
                 wWidth = w.innerWidth,
                 wHeight = w.innerHeight;
             $foreground.width = wWidth;
@@ -245,8 +247,8 @@ var phasebeam = function(canvasParentNode) {
                 i -= 1;
                 radius = $M.random()*(20+i*5)+(20+i*5);
                 this.items.circles.push({
-                    'x': $M.random()*(fWidth+radius*4),
-                    'y': $M.random()*(fHeight+radius*4),
+                    'x': $M.random()*(fWidth+radius*2),
+                    'y': $M.random()*(fHeight+radius*2),
                     'radius': radius,
                     'rgba': circle_rgb.concat($M.random()*0.3+circle_alpha*$M.random()*0.5),
                     'shadow': circle_shadow_rgb.concat($M.random()*0.5+circle_shadow_alpha*0.5),
