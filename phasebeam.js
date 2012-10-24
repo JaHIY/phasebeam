@@ -132,7 +132,7 @@ var phasebeam = function(canvasParentNode) {
         'config': {
             'circle': {
                 'amount': 10,
-                'rgba': [157, 97, 207, 0.4],
+                'rgba': [157, 97, 207, 0.3],
                 'rgba_delta': 5,
                 'shadow': [46, 30, 105, 0.9],
                 'shadow_delta': 3,
@@ -279,9 +279,9 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random()*(fWidth+radius*2),
                     'y': $M.random()*(fHeight+radius*2),
                     'radius': radius,
-                    'rgba': [delta_color(circle_blue, circle_rgba_delta), delta_color(circle_green, circle_rgba_delta), delta_color(circle_blue, circle_rgba_delta), $M.random()*0.3+circle_alpha*$M.random()*0.7],
+                    'rgba': [delta_color(circle_blue, circle_rgba_delta), delta_color(circle_green, circle_rgba_delta), delta_color(circle_blue, circle_rgba_delta), $M.random()*0.4+circle_alpha*$M.random()*0.6],
                     'shadow': [delta_color(circle_shadow_red, circle_shadow_delta), delta_color(circle_shadow_green, circle_shadow_delta), delta_color(circle_shadow_blue, circle_shadow_delta), $M.random()*0.5+circle_shadow_alpha*0.5],
-                    'blur': $M.random()*circle_blur*0.5,
+                    'blur': $M.random()*circle_blur,
                     'speed': circle_speed*(0.8+i*0.5)
                 });
             }
@@ -292,9 +292,9 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random()*(fWidth+width*cosaAbs),
                     'y': $M.random()*(fHeight+width*sinaAbs),
                     'width': width,
-                    'rgba': [delta_color(line_red, line_rgba_delta), delta_color(line_green, line_rgba_delta), delta_color(line_blue, line_rgba_delta), $M.random()*0.2+line_alpha*$M.random()*0.8],
+                    'rgba': [delta_color(line_red, line_rgba_delta), delta_color(line_green, line_rgba_delta), delta_color(line_blue, line_rgba_delta), $M.random()*0.4+line_alpha*$M.random()*0.6],
                     'shadow': [delta_color(line_shadow_red, line_shadow_delta), delta_color(line_shadow_green, line_shadow_delta), delta_color(line_shadow_blue, line_shadow_delta), $M.random()*0.5+line_shadow_alpha*0.5],
-                    'blur': $M.random()*line_blur*0.3,
+                    'blur': $M.random()*line_blur,
                     'speed': line_speed*(0.8+j*0.5)
                 });
             }
