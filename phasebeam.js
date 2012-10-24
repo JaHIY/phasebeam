@@ -133,14 +133,18 @@ var phasebeam = function(canvasParentNode) {
             'circle': {
                 'amount': 10,
                 'rgba': [157, 97, 207, 0.4],
+                'rgba_delta': 5,
                 'shadow': [46, 30, 105, 0.9],
+                'shadow_delta': 3,
                 'blur': 0.2,
                 'speed': 0.3,
             },
             'line': {
                 'amount': 10,
                 'rgba': [255, 255, 255, 0.5],
+                'rgba_delta': 5,
                 'shadow': [255, 255, 255, 0.8],
+                'shadow_delta': 3,
                 'blur': 0.1,
                 'speed': 0.5,
             },
@@ -224,23 +228,48 @@ var phasebeam = function(canvasParentNode) {
                 config = this.config,
                 circle = config.circle,
                 i = circle.amount,
-                circle_rgb = circle.rgba.slice(0, 3),
+                circle_red = circle.rgba[0],
+                circle_green = circle.rgba[1],
+                circle_blue = circle.rgba[2],
                 circle_alpha = circle.rgba[3],
-                circle_shadow_rgb = circle.shadow.slice(0, 3),
+                circle_rgba_delta = circle.rgba_delta,
+                circle_shadow_red = circle.shadow[0],
+                circle_shadow_green = circle.shadow[1],
+                circle_shadow_blue = circle.shadow[2],
                 circle_shadow_alpha = circle.shadow[3],
+                circle_shadow_delta = circle.shadow_delta,
                 circle_blur = circle.blur,
                 circle_speed = circle.speed,
                 line = config.line,
                 j = line.amount,
-                line_rgb = line.rgba.slice(0, 3),
+                line_red = line.rgba[0],
+                line_green = line.rgba[1],
+                line_blue = line.rgba[2],
                 line_alpha = line.rgba[3],
-                line_shadow_rgb = line.shadow.slice(0, 3),
+                line_rgba_delta = line.rgba_delta,
+                line_shadow_red = line.shadow[0],
+                line_shadow_green = line.shadow[1],
+                line_shadow_blue = line.shadow[2],
                 line_shadow_alpha = line.shadow[3],
+                line_shadow_delta = line.shadow_delta,
                 line_blur = line.blur,
                 line_speed = line.speed,
                 fWidth = $foreground.width,
                 fHeight = $foreground.height,
-                radius, width;
+                radius, width,
+                delta_color = function(color, delta) {
+                    var d = ~~ ($M.pow(-1, ($M.random()*2&1))*$M.random()*(delta+1)), //~~(num+0.5) is the same as Math.round(), but faster
+                        color_delta = color + d;
+                    if (color_delta < 0) {
+                        return 0;
+                    } else {
+                        if (color_delta > 255) {
+                            return 255;
+                        } else {
+                            return color_delta;
+                        }
+                    }
+                };
             this.items.circles = [];
             this.items.lines = [];
             while (i > 0) {
@@ -250,8 +279,8 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random()*(fWidth+radius*2),
                     'y': $M.random()*(fHeight+radius*2),
                     'radius': radius,
-                    'rgba': circle_rgb.concat($M.random()*0.3+circle_alpha*$M.random()*0.5),
-                    'shadow': circle_shadow_rgb.concat($M.random()*0.5+circle_shadow_alpha*0.5),
+                    'rgba': [delta_color(circle_blue, circle_rgba_delta), delta_color(circle_green, circle_rgba_delta), delta_color(circle_blue, circle_rgba_delta), $M.random()*0.3+circle_alpha*$M.random()*0.7],
+                    'shadow': [delta_color(circle_shadow_red, circle_shadow_delta), delta_color(circle_shadow_green, circle_shadow_delta), delta_color(circle_shadow_blue, circle_shadow_delta), $M.random()*0.5+circle_shadow_alpha*0.5],
                     'blur': $M.random()*circle_blur*0.5,
                     'speed': circle_speed*(0.8+i*0.5)
                 });
@@ -263,12 +292,13 @@ var phasebeam = function(canvasParentNode) {
                     'x': $M.random()*(fWidth+width*cosaAbs),
                     'y': $M.random()*(fHeight+width*sinaAbs),
                     'width': width,
-                    'rgba': line_rgb.concat($M.random()*0.2+line_alpha*$M.random()*0.6),
-                    'shadow': line_shadow_rgb.concat($M.random()*0.5+line_shadow_alpha*0.5),
-                    'blur': $M.random()*line_blur*0.5,
+                    'rgba': [delta_color(line_red, line_rgba_delta), delta_color(line_green, line_rgba_delta), delta_color(line_blue, line_rgba_delta), $M.random()*0.2+line_alpha*$M.random()*0.8],
+                    'shadow': [delta_color(line_shadow_red, line_shadow_delta), delta_color(line_shadow_green, line_shadow_delta), delta_color(line_shadow_blue, line_shadow_delta), $M.random()*0.5+line_shadow_alpha*0.5],
+                    'blur': $M.random()*line_blur*0.3,
                     'speed': line_speed*(0.8+j*0.5)
                 });
             }
+            console.log(this.items.circles, this.items.lines);
             return this;
         },
         'items': {}
