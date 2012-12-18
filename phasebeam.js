@@ -23,110 +23,110 @@ var phasebeam = function(canvasParentNode) {
                 linesLastTime = [],
                 w = $w,
                 drawAnimatedCircles = function(fWidth, fHeight) {
-                var len = circles.length,
-                    item, x, y, radius, speed, time, lastTime;
-                while (len > 0) {
-                    len -= 1;
-                    item = circles[len];
-                    time = +new Date();
-                    lastTime = circlesLastTime[len] || time;
-                    circlesLastTime[len] = time;
-                    x = item.x;
-                    y = item.y;
-                    radius = item.radius;
-                    speed = item.speed*(time-lastTime)/100;
-                    if (x > fWidth + radius) {
-                        x = -radius;
-                    } else if (x < -radius) {
-                        x = fWidth + radius;
-                    } else {
-                        x += sina*speed;
+                    var len = circles.length,
+                        item, x, y, radius, speed, time, lastTime;
+                    while (len > 0) {
+                        len -= 1;
+                        item = circles[len];
+                        time = +new Date();
+                        lastTime = circlesLastTime[len] || time;
+                        circlesLastTime[len] = time;
+                        x = item.x;
+                        y = item.y;
+                        radius = item.radius;
+                        speed = item.speed*(time-lastTime)/100;
+                        if (x > fWidth + radius) {
+                            x = -radius;
+                        } else if (x < -radius) {
+                            x = fWidth + radius;
+                        } else {
+                            x += sina*speed;
+                        }
+                        if (y > fHeight + radius) {
+                            y = -radius;
+                        } else if (y < -radius) {
+                            y = fHeight + radius;
+                        } else {
+                            y -= cosa*speed;
+                        }
+                        item.x = x;
+                        item.y = y;
+                        drawCircle(x, y, radius, item.rgba, item.shadow, item.blur);
                     }
-                    if (y > fHeight + radius) {
-                        y = -radius;
-                    } else if (y < -radius) {
-                        y = fHeight + radius;
-                    } else {
-                        y -= cosa*speed;
+                },
+                drawAnimatedLines = function(fWidth, fHeight) {
+                    var len = lines.length,
+                        item, x, y, width, speed, endX, endY, time, lastTime;
+                    while (len > 0) {
+                        len -= 1;
+                        item = lines[len];
+                        time = +new Date();
+                        lastTime = linesLastTime[len] || time;
+                        linesLastTime[len] = time;
+                        x = item.x;
+                        y = item.y;
+                        width = item.width;
+                        speed = item.speed*(time-lastTime)/100;
+                        if (x > fWidth + width * sina) {
+                            x = -width * sina;
+                        } else if (x < -width * sina) {
+                            x = fWidth + width * sina;
+                        } else {
+                            x += sina*speed;
+                        }
+                        if (y > fHeight + width * cosa) {
+                            y = -width * cosa;
+                        } else if (y < -width * cosa) {
+                            y = fHeight + width * cosa;
+                        } else {
+                            y -= cosa*speed;
+                        }
+                        item.x = x;
+                        item.y = y;
+                        endX = x+sina*width;
+                        endY = y-cosa*width;
+                        drawLine(x, y, endX, endY, width, item.rgba, item.shadow, item.blur);
                     }
-                    item.x = x;
-                    item.y = y;
-                    drawCircle(x, y, radius, item.rgba, item.shadow, item.blur);
-                }
-            },
-            drawAnimatedLines = function(fWidth, fHeight) {
-                var len = lines.length,
-                    item, x, y, width, speed, endX, endY, time, lastTime;
-                while (len > 0) {
-                    len -= 1;
-                    item = lines[len];
-                    time = +new Date();
-                    lastTime = linesLastTime[len] || time;
-                    linesLastTime[len] = time;
-                    x = item.x;
-                    y = item.y;
-                    width = item.width;
-                    speed = item.speed*(time-lastTime)/100;
-                    if (x > fWidth + width * sina) {
-                        x = -width * sina;
-                    } else if (x < -width * sina) {
-                        x = fWidth + width * sina;
-                    } else {
-                        x += sina*speed;
+                },
+                clearCircles = function() {
+                    var len = circles.length,
+                        item, x, y, radius;
+                    while (len > 0) {
+                        len -= 1;
+                        item = circles[len];
+                        x = item.x;
+                        y = item.y;
+                        radius = item.radius;
+                        $fctx.clearRect(x-radius*1.2-1, y-radius*1.2-1, radius*2.4+2, radius*2.4+2);
                     }
-                    if (y > fHeight + width * cosa) {
-                        y = -width * cosa;
-                    } else if (y < -width * cosa) {
-                        y = fHeight + width * cosa;
-                    } else {
-                        y -= cosa*speed;
+                },
+                clearLines = function() {
+                    var len = lines.length,
+                        item, x, y, width, endX, endY, minX, minY;
+                    while (len > 0) {
+                        len -= 1;
+                        item = lines[len];
+                        x = item.x;
+                        y = item.y;
+                        width = item.width;
+                        endX = x+sina*width;
+                        endY = y-cosa*width;
+                        minX = x < endX ? x : endX;
+                        minY = y < endY ? y : endY;
+                        $fctx.clearRect(minX-cosaAbs*width*0.4, minY-sinaAbs*width*0.4, $M.abs(x-endX)+cosaAbs*width*0.4*2, $M.abs(y-endY)+sinaAbs*width*0.4*2);
                     }
-                    item.x = x;
-                    item.y = y;
-                    endX = x+sina*width;
-                    endY = y-cosa*width;
-                    drawLine(x, y, endX, endY, width, item.rgba, item.shadow, item.blur);
-                }
-            },
-            clearCircles = function() {
-                var len = circles.length,
-                    item, x, y, radius;
-                while (len > 0) {
-                    len -= 1;
-                    item = circles[len];
-                    x = item.x;
-                    y = item.y;
-                    radius = item.radius;
-                    $fctx.clearRect(x-radius*1.2-1, y-radius*1.2-1, radius*2.4+2, radius*2.4+2);
-                }
-            },
-            clearLines = function() {
-                var len = lines.length,
-                    item, x, y, width, endX, endY, minX, minY;
-                while (len > 0) {
-                    len -= 1;
-                    item = lines[len];
-                    x = item.x;
-                    y = item.y;
-                    width = item.width;
-                    endX = x+sina*width;
-                    endY = y-cosa*width;
-                    minX = x < endX ? x : endX;
-                    minY = y < endY ? y : endY;
-                    $fctx.clearRect(minX-cosaAbs*width*0.4, minY-sinaAbs*width*0.4, $M.abs(x-endX)+cosaAbs*width*0.4*2, $M.abs(y-endY)+sinaAbs*width*0.4*2);
-                }
-            },
-            start = function() {
-                var fWidth = $foreground.width,
-                    fHeight = $foreground.height;
-                clearCircles();
-                clearLines();
-                drawAnimatedCircles(fWidth, fHeight);
-                drawAnimatedLines(fWidth, fHeight);
-                w.reqAnimeFrame(function(){
-                    start();
-                });
-            };
+                },
+                start = function() {
+                    var fWidth = $foreground.width,
+                        fHeight = $foreground.height;
+                    clearCircles();
+                    clearLines();
+                    drawAnimatedCircles(fWidth, fHeight);
+                    drawAnimatedLines(fWidth, fHeight);
+                    w.reqAnimeFrame(function(){
+                        start();
+                    });
+                };
             start();
         },
         'config': {
